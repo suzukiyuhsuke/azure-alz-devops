@@ -6,6 +6,20 @@ variable "enable_github" {
   default     = true
 }
 
+variable "use_github_personal_account" {
+  description = "Use your GitHub personal account for create repository and other GitHub resources"
+  type        = bool
+  default     = false
+
+  validation {
+    condition = (
+      (!var.use_github_personal_account && var.github_organization_name != "") ||
+      (var.use_github_personal_account && var.github_user_name != "")
+    )
+    error_message = "If use_github_personal_account is false, github_organization_name must be set. If true, github_user_name must be set."
+  }
+}
+
 variable "github_organization_name" {
   description = "GitHub organization name"
   type        = string
@@ -15,6 +29,11 @@ variable "github_organization_name" {
     condition     = var.enable_github == false ? true : var.github_organization_name != ""
     error_message = "GitHub organization name must be not null string"
   }
+}
+
+variable "github_user_name" {
+  description = "Your personal GitHub Account"
+  type        = string 
 }
 
 variable "github_enterprise_name" {

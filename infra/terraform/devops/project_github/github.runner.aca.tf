@@ -1,7 +1,10 @@
 // github.runner.aca.tf
 
 locals {
-  runners = (var.use_self_hosted_runners
+  // github_runner_acaが存在するか確認
+  has_github_runner_aca = try(local.container_specs.github_runner_aca != null, false)
+  
+  runners = (var.use_self_hosted_runners && local.has_github_runner_aca
     ? [
       {
         event_job_name                 = local.container_app_job_name
@@ -33,7 +36,7 @@ locals {
 }
 
 module "github_runner_aca" {
-  count                             = var.use_self_hosted_runners && var.self_hosted_runners_type == "aca" ? 1 : 0
+  count                             = var.use_self_hosted_runners && var.self_hosted_runners_type == "aca" && local.has_github_runner_aca ? 1 : 0
   source                            = "../../modules/aca_event_job"
   resource_group_name               = local.agents_resource_group_name
   location                          = var.location

@@ -8,7 +8,7 @@ resource "github_repository" "this" {
   name                   = var.main_repository_name
   description            = var.main_repository_name
   auto_init              = true
-  visibility             = data.github_organization.this.plan == local.free_plan ? "public" : "private"
+  visibility             = local.plan == local.free_plan ? "public" : "private"
   allow_merge_commit     = true
   allow_squash_merge     = true
   allow_rebase_merge     = true

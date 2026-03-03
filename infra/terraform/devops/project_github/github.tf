@@ -3,10 +3,12 @@
 module "github" {
   source = "../../modules/github"
 
-  // Organizations
+  // Organizations - 空文字列の場合は個人アカウント、そうでなければ組織として扱われる
   organization_name = local.options.github.organization_name
+  // 個人アカウントの場合のGitHubユーザー名（organization_nameが空の場合に使用）
+  github_username   = var.github_username
 
-  // Teams
+  // Teams - organization_nameが空の場合、このパラメータは内部で無視される
   teams = module.workflow.teams
 
   // Repository

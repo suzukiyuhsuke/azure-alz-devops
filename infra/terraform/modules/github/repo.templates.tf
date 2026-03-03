@@ -5,7 +5,7 @@ resource "github_repository" "templates" {
   name                   = var.templates_repository_name
   description            = var.templates_repository_name
   auto_init              = true
-  visibility             = data.github_organization.this.plan == local.free_plan ? "public" : "private"
+  visibility             = local.plan == local.free_plan ? "public" : "private"
   allow_merge_commit     = true
   allow_squash_merge     = false
   allow_rebase_merge     = false
@@ -37,7 +37,8 @@ resource "github_repository_file" "templates" {
   ]
 }
 resource "github_actions_repository_access_level" "templates" {
-  count        = var.use_templates_repository ? 1 : 0
+  # このリソースはプライベートリポジトリの場合のみ適用可能
+  count        = var.use_templates_repository && (local.plan != local.free_plan) ? 1 : 0
   access_level = "organization"
   repository   = github_repository.templates[0].name
 

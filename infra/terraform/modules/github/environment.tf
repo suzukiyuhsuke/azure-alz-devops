@@ -9,6 +9,9 @@ locals {
       }
     ]]
   )
+  
+  // チーム機能が有効な場合のみレビュアーを設定
+  has_reviewers = local.teams_enabled
 }
 
 resource "github_repository_environment" "default" {
@@ -16,8 +19,9 @@ resource "github_repository_environment" "default" {
   environment = each.value
   repository  = github_repository.this.name
 
+  // depends_onは条件式を含めることができないため、共通の依存関係のみを設定
   depends_on = [
-    github_team_repository.this,
+    github_repository.this
   ]
 }
 
@@ -29,8 +33,12 @@ resource "github_repository_environment" "this" {
   prevent_self_review = each.value.prevent_self_review
   wait_timer          = each.value.wait_timer
 
-  reviewers {
-    teams = [for reviewer in each.value.reviewers : github_team.this[reviewer].id]
+  // チーム機能が有効で、かつレビュアーが指定されている場合のみレビュアーブロックを設定
+  dynamic "reviewers" {
+    for_each = local.has_reviewers && length(each.value.reviewers) > 0 ? [1] : []
+    content {
+      teams = [for reviewer in each.value.reviewers : github_team.this[reviewer].id]
+    }
   }
 
   deployment_branch_policy {
@@ -38,9 +46,9 @@ resource "github_repository_environment" "this" {
     custom_branch_policies = each.value.custom_branch_policies
   }
 
+  // depends_onは条件式を含めることができないため、共通の依存関係のみを設定
   depends_on = [
-    github_team.this,
-    github_team_repository.this,
+    github_repository.this
   ]
 }
 

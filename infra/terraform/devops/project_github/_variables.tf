@@ -11,6 +11,12 @@ variable "target_subscription_id" {
   }
 }
 
+variable "github_username" {
+  description = "個人アカウントでリポジトリを作成する場合のGitHubユーザー名。organization_nameが空の場合に必須。"
+  type        = string
+  default     = ""
+}
+
 variable "role_propagation_time" {
   type        = string
   description = "Wait seconds to propagate role assignments"

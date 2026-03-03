@@ -5,8 +5,9 @@ output "api_base_url" {
 }
 
 output "organization_plan" {
-  value = data.github_organization.this.plan
+  value = local.is_organization ? data.github_organization.this[0].plan : local.free_plan
 }
+
 output "organization_url" {
   value = local.organization_url
 }

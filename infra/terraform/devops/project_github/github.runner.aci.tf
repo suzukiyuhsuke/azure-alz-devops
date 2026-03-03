@@ -1,7 +1,12 @@
 // github.runner.aci.tf
 
+locals {
+  // github_runner_aciが存在するか確認yes
+  has_github_runner_aci = try(local.container_specs.github_runner_aci != null, false)
+}
+
 module "github_runner_aci" {
-  count               = var.use_self_hosted_runners && var.self_hosted_runners_type == "aci" ? 1 : 0
+  count               = var.use_self_hosted_runners && var.self_hosted_runners_type == "aci" && local.has_github_runner_aci ? 1 : 0
   source              = "../../modules/aci"
   resource_group_name = local.agents_resource_group_name
   location            = var.location
@@ -19,5 +24,5 @@ module "github_runner_aci" {
 }
 
 output "github_runner_aci_container_spec" {
-  value = local.container_specs.github_runner_aci.container.aci
+  value = local.has_github_runner_aci ? local.container_specs.github_runner_aci.container.aci : null
 }
